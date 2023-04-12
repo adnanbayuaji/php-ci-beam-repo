@@ -1,0 +1,131 @@
+<?php
+    //membuat class baru inherit CI_Model
+    class Itemcheckmodel extends CI_Model
+    {
+        //fungsi untuk melakukan penambahan data pada database
+        function tambah()
+        {
+            //mengambil data dari view
+            //lalu diletakkan ke variabel
+            $obyek = $this->input->post('obyek');
+            $standar = $this->input->post('standar');
+            $metode = $this->input->post('metode');
+            $alat = $this->input->post('alat');
+            $frekcheck = $this->input->post('frekcheck');
+            $createby = $this->session->userdata('id');
+            $createdate = date("Y-m-d H:i:s");
+
+            //meletakkan isi variabel ke dalam array
+            //array adalah nama kolom di tabel pada database
+            // $data = array('rol_deskripsi'=>$deskripsi, 'rol_status'=>$status, 'rol_createby'=>$createby, 'rol_createdate'=>$createdate, 'rol_modifby'=>$modifby, 'rol_modifdate'=>$modifdate);
+            $data = array('ite_obyek'=>$obyek, 'ite_standar'=>$standar, 'ite_status'=>$status, 'ite_metode'=>$metode, 'ite_alat'=>$alat,'ite_createby'=>$createby, 'ite_createdate'=>$createdate);
+
+            //menginput array $data ke dalam tabel database
+            $this->db->insert('beam_ms_itemcheck', $data);
+        }
+
+        //fungsi untuk membaca data dari database
+        function tampil()
+        {
+            //mengambil data dari tabel database ke variabel 
+            $tampil = $this->db->get('beam_ms_itemcheck');
+            
+            //memeriksa jumlah row != 0
+            if($tampil->num_rows() > 0)
+            {
+                //perulangan data diletakkan ke $data
+                foreach ($tampil->result() as $data)
+                {
+                    //setiap data yang ditemukan diletakkan ke array 
+                    $hasil[] = $data;
+                }
+                //mengembalikan nilai data dari array
+                return $hasil;
+            }
+        }
+
+        //fungsi untuk menghapus data di database
+        function hapuson($id)
+        {
+            $status = "Tidak Aktif";
+            $data = array('ite_status'=>$status);
+            $this->db->where('ite_id', $id);
+            $this->db->update('beam_ms_itemcheck', $data);
+        }
+
+        function hapusoff($id)
+        {
+            $status = "Aktif";
+            $data = array('ite_status'=>$status);
+            $this->db->where('ite_id', $id);
+            $this->db->update('beam_ms_itemcheck', $data);
+        }
+
+        //fungsi menampilkan saat akan mengubah
+        function ubah_tampil($id)
+        {
+            //membaca dari tabel
+            return $this->db->get_where('beam_ms_itemcheck', array('ite_id'=>$id))->row();
+        }
+
+        //fungsi ubah data
+        function ubah($id)
+        {
+            //mengambil dari post ke var
+            $obyek = $this->input->post('obyek');
+            $standar = $this->input->post('standar');
+            $metode = $this->input->post('metode');
+            $alat = $this->input->post('alat');
+            $modifby = $this->session->userdata('id');
+            $modifdate = date("Y-m-d H:i:s");
+
+            //meletakkan isi variabel ke dalam array
+            //array adalah nama kolom di tabel pada database
+            $data = array('ite_obyek'=>$obyek, 'ite_standar'=>$standar, 'ite_metode'=>$metode, 'ite_alat'=>$alat, 'ite_modifby'=>$modifby, 'ite_modifdate'=>$modifdate);
+
+            //kondisi yang akan dirubah by id
+            $this->db->where('ite_id', $id);
+
+            //update tabel ke array
+            $this->db->update('beam_ms_itemcheck', $data);
+        }
+
+        
+        // Fungsi untuk melakukan proses upload file
+        function upload_file($filename){
+            $this->load->library('upload'); // Load librari upload
+            
+            $config['upload_path'] = './excel/';
+            $config['allowed_types'] = 'xlsx';
+            $config['max_size']	= '2048';
+            $config['overwrite'] = true;
+            $config['file_name'] = $filename;
+        
+            $this->upload->initialize($config); // Load konfigurasi uploadnya
+            if($this->upload->do_upload('file')){ // Lakukan upload dan Cek jika proses upload berhasil
+                // Jika berhasil :
+                $return = array('result' => 'success', 'file' => $this->upload->data(), 'error' => '');
+                return $return;
+            }else{
+                // Jika gagal :
+                $return = array('result' => 'failed', 'file' => '', 'error' => $this->upload->display_errors());
+                return $return;
+            }
+        }
+
+        public function insert_import($iteobyek, $itestandar, $itemetode, $itealat){
+            // if (count($data) > 0) {
+            //     foreach($data as $datas)
+			// 	{
+            //         $this->db->insert('beam_dtl_equipment', $data);
+			// 	}
+            // }
+            
+            $createby = $this->session->userdata('id');
+            $createdate = date("Y-m-d H:i:s");
+            $data = array('ite_obyek'=>$iteobyek, 'ite_standar'=>$itestandar, 'ite_metode'=>$itemetode, 'ite_alat'=>$itealat,'ite_status'=>'Aktif','ite_createby'=>$createby, 'ite_createdate'=>$createdate);
+
+            $this->db->insert('beam_ms_itemcheck', $data);
+        }
+    }
+?>

@@ -1,0 +1,19 @@
+Administrator:
+id: admin
+pass: admin
+
+PIC Teknisi P5
+id: iman.s
+pass: Astra123
+
+PIC GA P5
+id: picga
+pass: picga
+
+PIC Manager P5
+id: ferry.n
+pass: Astra123
+
+PIC User P5
+id: picuserga
+pass: picuserga
